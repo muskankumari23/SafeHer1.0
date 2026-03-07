@@ -1,72 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-
-<title>SafeHer Login</title>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHer - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body>
+<body class="login-vibrant-bg">
+    <div class="auth-container" style="background: transparent;">
+        <div class="login-card-modern">
+            <h1>Login</h1>
 
-<div class="container">
+            {% if error %}
+            <div class="alert alert-error">{{ error }}</div>
+            {% endif %}
 
-<div class="left-panel">
+            <form action="{{ url_for('login') }}" method="POST">
+                <div class="input-icon-wrapper">
+                    <label>Username / Email</label>
+                    <span class="icon">👤</span>
+                    <input type="text" name="email_or_phone" required placeholder="Type your username or email">
+                </div>
 
-<div class="logo">SAFEHER</div>
+                <div class="input-icon-wrapper">
+                    <label>Password</label>
+                    <span class="icon">🔒</span>
+                    <input type="password" name="password" required placeholder="Type your password">
+                </div>
 
-<div class="hero-text">
+                <a href="#" class="forgot-pwd">Forgot password?</a>
 
-<h1>SAFEHER</h1>
+                <button type="submit" class="btn-gradient">LOGIN</button>
+            </form>
 
-<p>
-Women-only safety platform with AI protection,
-emergency alerts, trusted contacts and community
-support built on trust, empathy and security.
-</p>
+            <div class="social-text">Or Sign Up Using</div>
+            <div class="social-icons">
+                <a href="#" class="social-circle fb-bg">f</a>
+                <a href="#" class="social-circle tw-bg">t</a>
+                <a href="#" class="social-circle go-bg">G</a>
+            </div>
 
-</div>
-
-</div>
-
-
-<div class="right-panel">
-
-<div class="login-card">
-
-<h2>Join the largest Safety Network for Women</h2>
-
-<button class="login-btn primary" onclick="window.location.href='/email-login'">
-Continue with Email / Mobile No.
-</button>
-
-<button class="login-btn facebook" onclick="window.location.href='/facebook-login'">
-<i class="fab fa-facebook"></i>
-Continue with Facebook
-</button>
-
-<button class="login-btn google" onclick="window.location.href='/google-login'">
-<i class="fab fa-google"></i>
-Continue with Google
-</button>
-
-<p class="terms">
-By continuing, you agree to our
-<a href="/terms">Terms</a>
-and
-<a href="/privacy">Privacy Policy</a>
-</p>
-
-</div>
-
-</div>
-
-</div>
-
+            <div class="bottom-signup-text">
+                Or Sign Up Using<br>
+                <a href="{{ url_for('signup') }}" class="bottom-signup-link">SIGN UP</a>
+            </div>
+        </div>
+    </div>
 </body>
+
 </html>

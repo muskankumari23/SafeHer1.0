@@ -1,151 +1,195 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 import sqlite3
 import os
-import random
+import joblib
+import numpy as np
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = "safeher_secret_key"
+app.secret_key = "safeher_production_secret_key"
 
 DB_PATH = "database/users.db"
+MODEL_PATH = "model/risk_model.pkl"
 
+# Initialize DB if not exists
+if not os.path.exists(DB_PATH):
+    import create_db
+    print("Initializing Database...")
 
-def init_db():
-    os.makedirs("database", exist_ok=True)
+# Load ML Model
+try:
+    risk_model = joblib.load(MODEL_PATH)
+    print("Risk Model Loaded Successfully.")
+except Exception as e:
+    print(f"Warning: Risk model not found at {MODEL_PATH}. {e}")
+    risk_model = None
+
+# ----------------- DB Helpers -----------------
+
+def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
-
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def get_user_by_email(email):
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("SELECT id, name, email, password FROM users WHERE email = ?", (email,))
-    user = cur.fetchone()
+    conn = get_db_connection()
+    user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
     conn.close()
     return user
 
-
-def create_user(name, email, password):
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", (name, email, password))
+def create_user(name, phone, email, password, contact1, contact2):
+    conn = get_db_connection()
+    hashed_pw = generate_password_hash(password)
+    conn.execute(
+        "INSERT INTO users (name, phone, email, password, contact1, contact2) VALUES (?, ?, ?, ?, ?, ?)",
+        (name, phone, email, hashed_pw, contact1, contact2)
+    )
     conn.commit()
     conn.close()
 
+# ----------------- Web Routes -----------------
 
 @app.route("/")
 def home():
-    return render_template("home.html")
-
-
-@app.route("/login")
-def login():
+    if "user_id" in session:
+        return redirect(url_for("dashboard"))
     return render_template("login.html")
 
-
-@app.route("/auth", methods=["GET", "POST"])
-def auth():
+@app.route("/login", methods=["GET", "POST"])
+def login():
     if request.method == "POST":
-        email = request.form.get("email")
+        email_or_phone = request.form.get("email_or_phone")
         password = request.form.get("password")
 
-        user = get_user_by_email(email)
+        # Support login by email OR phone
+        conn = get_db_connection()
+        user = conn.execute("SELECT * FROM users WHERE email = ? OR phone = ?", (email_or_phone, email_or_phone)).fetchone()
+        conn.close()
 
-        if user and user[3] == password:
-            session["user"] = user[2]
-            session["name"] = user[1]
+        if user and check_password_hash(user["password"], password):
+            session["user_id"] = user["id"]
+            session["name"] = user["name"]
+            session["contact1"] = user["contact1"]
+            session["contact2"] = user["contact2"]
             return redirect(url_for("dashboard"))
         else:
-            return render_template("auth.html", error="Invalid email or password", active_tab="email")
+            return render_template("login.html", error="Invalid credentials.")
 
-    return render_template("auth.html", active_tab="email")
-
+    return render_template("login.html")
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
         name = request.form.get("name")
+        phone = request.form.get("phone")
         email = request.form.get("email")
         password = request.form.get("password")
+        contact1 = request.form.get("contact1")
+        contact2 = request.form.get("contact2", "")
 
-        if not name or not email or not password:
-            return render_template("signup.html", error="Please fill all fields")
+        if not name or not phone or not email or not password or not contact1:
+            return render_template("signup.html", error="Please fill all required fields")
 
-        existing_user = get_user_by_email(email)
-        if existing_user:
+        if get_user_by_email(email):
             return render_template("signup.html", error="Email already exists")
 
-        create_user(name, email, password)
-        return render_template("signup.html", success="Account created successfully. Now login.")
+        create_user(name, phone, email, password, contact1, contact2)
+        return render_template("signup.html", success="Account created! Please login.")
 
     return render_template("signup.html")
 
-
-@app.route("/send-otp", methods=["POST"])
-def send_otp():
-    phone = request.form.get("phone")
-
-    if not phone or not phone.isdigit() or len(phone) != 10:
-        return render_template("auth.html", error="Enter a valid 10-digit mobile number", active_tab="phone")
-
-    otp = str(random.randint(100000, 999999))
-    session["otp"] = otp
-    session["phone"] = phone
-    session["name"] = "User"
-
-    print(f"Demo OTP for {phone}: {otp}")
-
-    return render_template(
-        "auth.html",
-        message="OTP sent successfully. Check terminal for demo OTP.",
-        active_tab="phone"
-    )
-
-
-@app.route("/verify-otp", methods=["POST"])
-def verify_otp():
-    entered_otp = request.form.get("otp")
-
-    if entered_otp == session.get("otp"):
-        session["user"] = session.get("phone")
-        return redirect(url_for("dashboard"))
-    else:
-        return render_template("auth.html", error="Invalid OTP", active_tab="phone")
-
-
 @app.route("/dashboard")
 def dashboard():
-    if "user" not in session:
+    if "user_id" not in session:
         return redirect(url_for("login"))
-    return render_template("dashboard.html", username=session.get("name", "User"))
-
-
-@app.route("/terms")
-def terms():
-    return render_template("terms.html")
-
-
-@app.route("/privacy")
-def privacy():
-    return render_template("privacy.html")
-
+    return render_template(
+        "dashboard.html", 
+        username=session.get("name"),
+        contact1=session.get("contact1", "+11234567890"),  # Fallbacks
+        contact2=session.get("contact2", "+10987654321")
+    )
 
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("home"))
+    return redirect(url_for("login"))
+
+# ----------------- API Endpoints -----------------
+
+@app.route("/api/risk-score", methods=["POST"])
+def calculate_risk():
+    """
+    Receives frontend sensor data, runs through the ML model, 
+    and returns Risk Level (LOW, MEDIUM, HIGH)
+    """
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if risk_model is None:
+         return jsonify({"error": "ML Model not loaded"}), 500
+
+    data = request.json
+    try:
+        # Extract features matching the trained model columns
+        features = [
+            int(data.get("voice_detected", 0)),
+            int(data.get("shake_detected", 0)),
+            int(data.get("fall_detected", 0)),
+            int(data.get("running_detected", 0)),
+            int(data.get("loud_noise", 0)),
+            int(data.get("late_night", 0)),
+            int(data.get("unknown_location", 0)),
+            float(data.get("heart_rate", 80)),      # Synthetic wearable data
+            float(data.get("stress_level", 3))       # Synthetic wearable data
+        ]
+
+        # Reshape for sklearn prediction
+        input_vector = np.array(features).reshape(1, -1)
+        
+        # Predict
+        predicted_risk = risk_model.predict(input_vector)[0]
+        
+        return jsonify({
+            "status": "success",
+            "risk_level": predicted_risk
+        })
+
+    except Exception as e:
+        print(f"Error in prediction: {e}")
+        return jsonify({"error": str(e)}), 400
+
+@app.route("/api/alert", methods=["POST"])
+def trigger_alert():
+    """
+    Simulates sending an emergency alert via SMS/Call.
+    In a real app, integrate Twilio here.
+    """
+    data = request.json
+    lat = data.get("lat")
+    lng = data.get("lng")
+    risk_level = data.get("risk_level", "HIGH")
+    
+    maps_link = f"https://maps.google.com/?q={lat},{lng}" if lat and lng else "Location Unavailable"
+    user_name = session.get("name", "User")
+    
+    # Get contacts to alert
+    contacts_to_alert = [c for c in [session.get('contact1'), session.get('contact2'), '+19998887777'] if c]
+    
+    message = (
+        f"SafeHer ALARM from {user_name}! "
+        f"Detected Risk: {risk_level}. "
+        f"Location: {maps_link} "
+        "Triggering Emergency APIs..."
+    )
+    
+    print("\n" + "="*50)
+    print("🚨 EMERGENCY ALERT TRIGGERED 🚨")
+    print(f"Message Sent to Contacts: {', '.join(contacts_to_alert)}")
+    print(message)
+    print("="*50 + "\n")
+
+    return jsonify({"status": "alert_sent", "message": message, "alerted_contacts": contacts_to_alert})
 
 
 if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
-    
+    app.run(debug=True, port=5000)
