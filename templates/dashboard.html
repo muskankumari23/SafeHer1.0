@@ -1,143 +1,155 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeHer - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
+{% block title %}SafeHer - Dashboard{% endblock %}
+{% block nav_dash %}active{% endblock %}
 
-<body>
-    <!-- Top Navigation Bar -->
-    <nav class="top-nav">
-        <div class="nav-links">
-            <a href="#" class="active">Home</a>
-            <a href="#">Partners</a>
-            <a href="#">Safety Tips</a>
-            <a href="#">Support</a>
-        </div>
-        <div class="logo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            <h2>SafeHer</h2>
-        </div>
-        <div class="user-profile">
-            <div class="avatar">
-                <img src="https://ui-avatars.com/api/?name={{ username }}&background=e0e7ff&color=4f46e5" alt="User">
-            </div>
-            <span>{{ username }}</span>
-            <a href="{{ url_for('logout') }}" class="dropdown-icon">▼</a>
-        </div>
-    </nav>
+{% block content %}
+<div class="dashboard-container">
+    <!-- Hub Grid Layout -->
+    <div class="dashboard-grid">
 
-    <div class="dashboard-container">
-        <!-- New Grid Layout -->
-        <div class="dashboard-grid">
-
-            <!-- Intro / Action Card (Top Left) -->
-            <div class="card intro-card">
-                <span class="badge">Women Safety • Smart Monitoring</span>
-                <h1>Your Safety,<br>Your Strength</h1>
-                <p>Track your live location, monitor risk and use instant SOS support.</p>
-                <button class="btn btn-primary" id="enable-sensors-btn">Get Started</button>
-            </div>
-
-            <!-- Protected & Connected Status Card (Top Right) -->
-            <div class="card status-card">
-                <h2>Protected & Connected</h2>
-                <p>Your AI safety tools are active and ready.</p>
-                <div class="status-grid">
-                    <div class="status-item"><span id="loc-dot" class="dot inactive"></span> Location <span
-                            id="loc-status">Off</span></div>
-                    <div class="status-item"><span id="voice-dot" class="dot inactive"></span> Alerts Ready <span
-                            id="voice-status"></span></div>
-                    <div class="status-item">📞 Emergency Set</div>
-                    <div class="status-item"><span id="motion-dot" class="dot inactive"></span> AI Active <span
-                            id="motion-status"></span></div>
-                </div>
-            </div>
-
-            <!-- Live Location Map (Bottom Left) -->
-            <div class="card map-card">
-                <div class="card-header">
-                    <h2>Your Live Location</h2>
-                    <span class="badge badge-live">Live</span>
-                </div>
-                <div id="map"></div>
-                <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
-                    <button class="btn btn-primary" id="share-loc-btn"
-                        style="box-shadow: 0 4px 15px rgba(0,0,0,0.2);">📍 Share Location</button>
-                    <p id="share-loc-status"
-                        style="text-align: center; margin-top: 5px; font-weight: bold; color: #a02050; background: rgba(255,255,255,0.8); border-radius: 4px; padding: 2px 5px; display: none;">
-                    </p>
-                </div>
-            </div>
-
-            <!-- Right Column for Risk and Emergency (Bottom Right) -->
-            <div class="right-col">
-                <!-- Risk Level Card -->
-                <div class="card risk-card">
-                    <h2>Risk Level</h2>
-                    <div class="risk-level-display">
-                        <span id="risk-level" class="risk-low">LOW</span>
-                    </div>
-                    <p class="risk-subtext">No danger detected yet.</p>
-                </div>
-
-                <!-- Emergency Help / Contacts -->
-                <div class="card emergency-card sos-container">
-                    <h2>Emergency Help</h2>
-                    <button class="btn-sos" id="sos-btn">SOS</button>
-                    <p id="sos-status"></p>
-                    <ul class="contacts-list">
-                        <li>📞 {{ contact1 }} (Primary)</li>
-                        {% if contact2 %}
-                        <li>📞 {{ contact2 }} (Secondary)</li>
-                        {% endif %}
-                        <li>📞 +19998887777 (Local Police)</li>
-                    </ul>
-                </div>
-            </div>
-
+        <!-- Intro / Action Card (Top Left) -->
+        <div class="card intro-card">
+            <span class="badge">Women Safety • Smart Monitoring</span>
+            <h1>Welcome,<br>{{ session.get('name', 'User').split(' ')[0] }}</h1>
+            <p>Your safety dashboard is ready. Enable sensors to start live tracking and AI risk monitoring.</p>
+            <button class="btn btn-primary" id="enable-sensors-btn">Enable SafeHer AI</button>
         </div>
 
-        <!-- Popup for Medium/Low Risk -->
-        <div id="checkin-modal" class="modal">
-            <div class="modal-content">
-                <h2>Are you safe?</h2>
-                <p>We detected unusual activity. Please confirm you are safe.</p>
-                <div class="modal-actions">
-                    <button id="safe-btn" class="btn" style="background-color: var(--success);">Yes, I'm Safe</button>
-                    <button id="danger-btn" class="btn" style="background-color: var(--sos-red);">No, Need
-                        Help!</button>
-                </div>
-                <p style="margin-top: 1rem; font-size: 0.8rem; color: #666;">Auto-alerting in <span
-                        id="countdown">15</span>s...</p>
+        <!-- Protected & Connected Status Card (Top Right) -->
+        <div class="card status-card">
+            <h2>System Status</h2>
+            <p>Your AI safety tools are active and ready.</p>
+            <div class="status-grid">
+                <div class="status-item"><span id="loc-dot" class="dot inactive"></span> Location <span
+                        id="loc-status">Off</span></div>
+                <div class="status-item"><span id="voice-dot" class="dot inactive"></span> Alerts Ready <span
+                        id="voice-status"></span></div>
+                <div class="status-item">📞 Emergency Set</div>
+                <div class="status-item"><span id="motion-dot" class="dot inactive"></span> AI Active <span
+                        id="motion-status"></span></div>
             </div>
         </div>
+
+        <!-- Live Location Map (Bottom Left) -->
+        <div class="card map-card">
+            <div class="card-header">
+                <h2>Your Live Location</h2>
+                <span class="badge badge-live">Live</span>
+            </div>
+            <div id="map"></div>
+            <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
+                <button class="btn btn-primary" id="share-loc-btn" style="box-shadow: 0 4px 15px rgba(0,0,0,0.2);">📍
+                    Share Location</button>
+                <p id="share-loc-status"
+                    style="text-align: center; margin-top: 5px; font-weight: bold; color: #a02050; background: rgba(255,255,255,0.8); border-radius: 4px; padding: 2px 5px; display: none;">
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Column for Risk and Emergency (Bottom Right) -->
+        <div class="right-col">
+            <!-- Risk Level Card -->
+            <div class="card risk-card">
+                <h2>Risk Level</h2>
+                <div class="risk-level-display">
+                    <span id="risk-level" class="risk-low">LOW</span>
+                </div>
+                <p class="risk-subtext">No danger detected yet.</p>
+            </div>
+
+            <!-- Emergency Help / Contacts -->
+            <div class="card emergency-card sos-container">
+                <h2>Emergency Help</h2>
+                <button class="btn-sos" id="sos-btn">SOS</button>
+                <p id="sos-status"></p>
+                <ul class="contacts-list">
+                    <li>📞 {{ session.get('contact1') }} (Primary)</li>
+                    {% if session.get('contact2') %}
+                    <li>📞 {{ session.get('contact2') }} (Secondary)</li>
+                    {% endif %}
+                    <li>📞 +19998887777 (Local Police)</li>
+                </ul>
+            </div>
+        </div>
+
     </div>
 
-    <!-- JavaScript Modules -->
-    <script>
-        // Store globals for the frontend scripts to access
-        window.flaskConfig = {
-            riskApiUrl: "{{ url_for('calculate_risk') }}",
-            alertApiUrl: "{{ url_for('trigger_alert') }}",
-            userName: "{{ username }}"
-        };
-    </script>
+    <!-- Hub Quick Access Section -->
+    <h2 style="margin-top: 3rem; color: #a02050; font-weight: 700;">SafeHer Hub</h2>
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
 
-    <!-- Load scripts in order -->
-    <script src="{{ url_for('static', filename='js/location.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/voiceDetection.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/motionDetection.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/sos.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/riskEngine.js') }}"></script>
+        <a href="{{ url_for('emergency_contacts') }}" style="text-decoration: none;">
+            <div class="card" style="align-items: center; padding: 1.5rem; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 2rem;">👥</span>
+                <h3 style="color: #6a5acd; margin: 0.5rem 0 0 0; font-size: 1.1rem;">Manage Contacts</h3>
+            </div>
+        </a>
 
-</body>
+        <a href="{{ url_for('risk_analysis') }}" style="text-decoration: none;">
+            <div class="card" style="align-items: center; padding: 1.5rem; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 2rem;">📊</span>
+                <h3 style="color: #6a5acd; margin: 0.5rem 0 0 0; font-size: 1.1rem;">Risk Analysis</h3>
+            </div>
+        </a>
 
-</html>
+        <a href="{{ url_for('safety_tips') }}" style="text-decoration: none;">
+            <div class="card" style="align-items: center; padding: 1.5rem; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 2rem;">🛡️</span>
+                <h3 style="color: #6a5acd; margin: 0.5rem 0 0 0; font-size: 1.1rem;">Safety Tips</h3>
+            </div>
+        </a>
+
+        <a href="{{ url_for('helpline') }}" style="text-decoration: none;">
+            <div class="card" style="align-items: center; padding: 1.5rem; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 2rem;">☎️</span>
+                <h3 style="color: #6a5acd; margin: 0.5rem 0 0 0; font-size: 1.1rem;">Helplines</h3>
+            </div>
+        </a>
+
+        <a href="{{ url_for('profile') }}" style="text-decoration: none;">
+            <div class="card" style="align-items: center; padding: 1.5rem; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 2rem;">⚙️</span>
+                <h3 style="color: #6a5acd; margin: 0.5rem 0 0 0; font-size: 1.1rem;">Profile Settings</h3>
+            </div>
+        </a>
+    </div>
+
+    <!-- Popup for Medium/Low Risk -->
+    <div id="checkin-modal" class="modal">
+        <div class="modal-content">
+            <h2>Are you safe?</h2>
+            <p>We detected unusual activity. Please confirm you are safe.</p>
+            <div class="modal-actions">
+                <button id="safe-btn" class="btn" style="background-color: var(--success);">Yes, I'm Safe</button>
+                <button id="danger-btn" class="btn" style="background-color: var(--sos-red);">No, Need Help!</button>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.8rem; color: #666;">Auto-alerting in <span
+                    id="countdown">15</span>s...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- JavaScript Modules -->
+<script>
+    window.flaskConfig = {
+        riskApiUrl: "{{ url_for('calculate_risk') }}",
+        alertApiUrl: "{{ url_for('trigger_alert') }}",
+        userName: "{{ session.get('name', 'User') }}"
+    };
+</script>
+
+<script src="{{ url_for('static', filename='js/location.js') }}"></script>
+<script src="{{ url_for('static', filename='js/voiceDetection.js') }}"></script>
+<script src="{{ url_for('static', filename='js/motionDetection.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/riskEngine.js') }}"></script>
+{% endblock %}

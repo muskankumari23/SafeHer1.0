@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}SafeHer - Emergency Contacts{% endblock %}
+{% block nav_contacts %}active{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 600px;">
+    <div class="card" style="padding: 3rem;">
+        <h2 style="color: #a02050; margin-bottom: 0.5rem; text-align: center;">Manage Emergency Contacts</h2>
+        <p style="color: #666; text-align: center; margin-bottom: 2rem;">These contacts will simultaneously receive your
+            SOS alerts and live location.</p>
+
+        {% if success %}
+        <div class="alert alert-success"
+            style="background-color: #f0fff0; color: #52c41a; border: 1px solid #52c41a; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <form action="{{ url_for('emergency_contacts') }}" method="POST">
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Primary Contact
+                    (Required)</label>
+                <div
+                    style="display: flex; align-items: center; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 0.5rem 1rem;">
+                    <span style="font-size: 1.2rem; margin-right: 0.5rem;">📞</span>
+                    <input type="tel" name="contact1" value="{{ session.get('contact1', '') }}" required
+                        style="border: none; background: transparent; width: 100%; font-size: 1rem; outline: none;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 2.5rem;">
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Secondary Contact
+                    (Optional)</label>
+                <div
+                    style="display: flex; align-items: center; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 0.5rem 1rem;">
+                    <span style="font-size: 1.2rem; margin-right: 0.5rem;">📞</span>
+                    <input type="tel" name="contact2" value="{{ session.get('contact2', '') }}"
+                        style="border: none; background: transparent; width: 100%; font-size: 1rem; outline: none;">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+                style="width: 100%; padding: 1rem; font-size: 1.1rem; border-radius: 30px;">Save Contacts</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

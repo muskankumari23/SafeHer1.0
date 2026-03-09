@@ -114,6 +114,84 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
+@app.route("/contacts", methods=["GET", "POST"])
+def emergency_contacts():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+        
+    success_msg = None
+    if request.method == "POST":
+        new_c1 = request.form.get("contact1")
+        new_c2 = request.form.get("contact2")
+        
+        conn = get_db_connection()
+        conn.execute("UPDATE users SET contact1 = ?, contact2 = ? WHERE id = ?", (new_c1, new_c2, session["user_id"]))
+        conn.commit()
+        conn.close()
+        
+        # Update session
+        session["contact1"] = new_c1
+        session["contact2"] = new_c2
+        success_msg = "Emergency contacts updated successfully!"
+
+    return render_template("emergency_contacts.html", success=success_msg)
+
+@app.route("/risk_analysis", methods=["GET", "POST"])
+def risk_analysis():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+        
+    risk_level = None
+    bg_color = None
+    text_color = None
+    recommendation = None
+    
+    if request.method == "POST":
+        suspicious_count = int(request.form.get("suspicious_count", 0))
+        unfamiliar = int(request.form.get("unfamiliar_location", 0))
+        threat = int(request.form.get("threat_level", 0))
+        
+        # Simple Logic-Based Model Weighting
+        score = (suspicious_count * 10) + (unfamiliar * 20) + (threat * 50)
+        
+        if score >= 50:
+            risk_level = "HIGH"
+            bg_color = "#fff0f0"
+            text_color = "#ff3b3b" # Red
+            recommendation = "You are in a high-risk situation. Trigger the SOS alert immediately or call emergency services."
+        elif score >= 20:
+            risk_level = "MEDIUM"
+            bg_color = "#fff9e6"
+            text_color = "#f57c00" # Orange
+            recommendation = "Stay alert. Move to a well-lit, crowded area and share your live location with a trusted contact."
+        else:
+            risk_level = "LOW"
+            bg_color = "#f0fff0"
+            text_color = "#2e7d32" # Green
+            recommendation = "You appear to be safe. Continue to stay aware of your surroundings."
+
+    return render_template("risk_analysis.html", 
+        risk_level=risk_level, bg_color=bg_color, text_color=text_color, recommendation=recommendation)
+
+@app.route("/safety_tips")
+def safety_tips():
+    return render_template("safety_tips.html")
+
+@app.route("/helpline")
+def helpline():
+    return render_template("helpline.html")
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+        
+    conn = get_db_connection()
+    user = conn.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchone()
+    conn.close()
+    
+    return render_template("profile.html", user=user)
+
 # ----------------- API Endpoints -----------------
 
 @app.route("/api/risk-score", methods=["POST"])

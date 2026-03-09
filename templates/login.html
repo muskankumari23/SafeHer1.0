@@ -1,53 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeHer - Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
+{% block title %}SafeHer - Login{% endblock %}
+{% block body_class %}login-vibrant-bg{% endblock %}
 
-<body class="login-vibrant-bg">
-    <div class="auth-container" style="background: transparent;">
-        <div class="login-card-modern">
-            <h1>Login</h1>
+{% block content %}
+<div class="auth-container" style="background: transparent; min-height: calc(100vh - 80px);">
+    <div class="login-card-modern">
+        <h1>Login</h1>
 
-            {% if error %}
-            <div class="alert alert-error">{{ error }}</div>
-            {% endif %}
+        {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
 
-            <form action="{{ url_for('login') }}" method="POST">
-                <div class="input-icon-wrapper">
-                    <label>Username / Email</label>
-                    <span class="icon">👤</span>
-                    <input type="text" name="email_or_phone" required placeholder="Type your username or email">
-                </div>
-
-                <div class="input-icon-wrapper">
-                    <label>Password</label>
-                    <span class="icon">🔒</span>
-                    <input type="password" name="password" required placeholder="Type your password">
-                </div>
-
-                <a href="#" class="forgot-pwd">Forgot password?</a>
-
-                <button type="submit" class="btn-gradient">LOGIN</button>
-            </form>
-
-            <div class="social-text">Or Sign Up Using</div>
-            <div class="social-icons">
-                <a href="#" class="social-circle fb-bg">f</a>
-                <a href="#" class="social-circle tw-bg">t</a>
-                <a href="#" class="social-circle go-bg">G</a>
+        <form action="{{ url_for('login') }}" method="POST">
+            <div class="input-icon-wrapper">
+                <label>Username / Email</label>
+                <span class="icon">👤</span>
+                <input type="text" name="email_or_phone" required placeholder="Type your username or email">
             </div>
 
-            <div class="bottom-signup-text">
-                Or Sign Up Using<br>
-                <a href="{{ url_for('signup') }}" class="bottom-signup-link">SIGN UP</a>
+            <div class="input-icon-wrapper">
+                <label>Password</label>
+                <span class="icon">🔒</span>
+                <input type="password" name="password" required placeholder="Type your password">
             </div>
+
+            <a href="#" class="forgot-pwd">Forgot password?</a>
+
+            <button type="submit" class="btn-gradient">LOGIN</button>
+        </form>
+
+        <div class="social-text">Or Sign Up Using</div>
+        <div class="social-icons">
+            <a href="#" class="social-circle fb-bg">f</a>
+            <a href="#" class="social-circle tw-bg">t</a>
+            <a href="#" class="social-circle go-bg">G</a>
+        </div>
+
+        <div class="bottom-signup-text">
+            Or Sign Up Using<br>
+            <a href="{{ url_for('signup') }}" class="bottom-signup-link">SIGN UP</a>
         </div>
     </div>
-</body>
-
-</html>
+</div>
+{% endblock %}

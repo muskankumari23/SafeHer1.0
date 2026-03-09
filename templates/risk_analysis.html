@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}SafeHer - Risk Analysis{% endblock %}
+{% block nav_risk %}active{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 700px;">
+    <div class="card" style="padding: 3rem;">
+        <h2 style="color: #a02050; text-align: center; margin-bottom: 0.5rem;">Manual Risk Analysis</h2>
+        <p style="color: #666; text-align: center; margin-bottom: 2rem;">Assess your current situation to receive
+            immediate AI-guided safety recommendations.</p>
+
+        <form method="POST" action="{{ url_for('risk_analysis') }}">
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Suspicious Activity
+                    Count</label>
+                <p style="font-size: 0.85rem; color: #888; margin-top: -0.25rem; margin-bottom: 0.5rem;">(e.g., people
+                    following you, strange noises, gut feeling)</p>
+                <input type="number" name="suspicious_count" min="0" value="0" required
+                    style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Are you in an unfamiliar or dark
+                    location?</label>
+                <select name="unfamiliar_location"
+                    style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; background-color: #fff;">
+                    <option value="0">No, I know this area</option>
+                    <option value="1">Yes, it's unfamiliar/dark</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 2.5rem;">
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Do you feel immediately
+                    threatened?</label>
+                <select name="threat_level"
+                    style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; background-color: #fff;">
+                    <option value="0">No</option>
+                    <option value="1">Yes, highly threatened</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+                style="width: 100%; padding: 1rem; font-size: 1.1rem; border-radius: 30px; background: linear-gradient(90deg, #6a5acd, #a02050);">Analyze
+                Risk</button>
+        </form>
+
+        {% if risk_level %}
+        <div
+            style="margin-top: 3rem; text-align: center; padding: 2rem; border-radius: 12px; background-color: {{ bg_color }}; border: 2px solid {{ text_color }}; animation: popIn 0.4s ease-out;">
+            <p
+                style="color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; font-weight: 600;">
+                Prediction Result</p>
+            <h3 style="font-size: 2.5rem; margin: 0 0 1rem 0; color: {{ text_color }};">{{ risk_level }} RISK</h3>
+            <p style="font-size: 1.1rem; color: #444; font-weight: 500; margin: 0;">{{ recommendation }}</p>
+
+            {% if risk_level == 'HIGH' %}
+            <div style="margin-top: 1.5rem;">
+                <button id="sos-btn" class="btn-sos"
+                    style="width: 80px; height: 80px; font-size: 1rem; margin: 0;">SOS</button>
+                <script src="{{ url_for('static', filename='js/location.js') }}"></script>
+                <script src="{{ url_for('static', filename='js/sos.js') }}"></script>
+                <script>
+                    window.flaskConfig = { alertApiUrl: "{{ url_for('trigger_alert') }}", userName: "{{ session.get('name') }}" };
+                </script>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

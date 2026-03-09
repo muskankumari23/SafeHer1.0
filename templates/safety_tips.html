@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}SafeHer - Safety Tips{% endblock %}
+{% block nav_tips %}active{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="color: #a02050; font-size: 2.5rem; margin-bottom: 0.5rem;">Safety Guidelines & Tips</h1>
+        <p style="color: #666; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Read through these essential safety
+            guidelines designed to help you stay aware, prepared, and safe in various situations.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+
+        <div class="card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 4px solid #ea70f1;">
+            <h2>🚕 Travel Safety</h2>
+            <ul style="color: #555; line-height: 1.8; padding-left: 1.2rem;">
+                <li>Always share your live journey details with a trusted contact before boarding a cab.</li>
+                <li>Check the child-lock mechanism on cab doors before the ride starts.</li>
+                <li>Avoid giving out personal information like your exact address to drivers.</li>
+                <li>Keep the SafeHer dashboard open and active when traveling at night.</li>
+            </ul>
+        </div>
+
+        <div class="card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 4px solid #6a5acd;">
+            <h2>🌙 Night Commutes</h2>
+            <ul style="color: #555; line-height: 1.8; padding-left: 1.2rem;">
+                <li>Stick to well-lit, populated routes whenever possible.</li>
+                <li>Stay alert—avoid using noise-canceling headphones when walking alone.</li>
+                <li>Walk purposefully and confidently to your destination.</li>
+                <li>If you feel followed, head directly to a crowded place like a 24/7 store or gas station.</li>
+            </ul>
+        </div>
+
+        <div class="card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 4px solid #4de6f9;">
+            <h2>📱 Digital Safety</h2>
+            <ul style="color: #555; line-height: 1.8; padding-left: 1.2rem;">
+                <li>Do not check-in on social media until you have left the location.</li>
+                <li>Review your privacy settings on social accounts periodically.</li>
+                <li>Keep emergency contacts updated on your SafeHer profile.</li>
+                <li>Ensure your phone is fully charged before leaving home.</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}SafeHer - Helpline Numbers{% endblock %}
+{% block nav_help %}active{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 900px;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="color: #a02050; font-size: 2.5rem; margin-bottom: 0.5rem;">Emergency Helplines</h1>
+        <p style="color: #666; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">One-tap dial access to essential
+            emergency and support services.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+
+        <!-- Police -->
+        <a href="tel:100" style="text-decoration: none; color: inherit;">
+            <div class="card" style="text-align: center; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🚓</span>
+                <h3 style="margin: 0; color: #333;">Police</h3>
+                <h2 style="color: #ea70f1; margin: 0.5rem 0 0 0; font-size: 2rem;">100</h2>
+            </div>
+        </a>
+
+        <!-- Women Helpline -->
+        <a href="tel:1091" style="text-decoration: none; color: inherit;">
+            <div class="card" style="text-align: center; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🛡️</span>
+                <h3 style="margin: 0; color: #333;">Women Helpline</h3>
+                <h2 style="color: #ea70f1; margin: 0.5rem 0 0 0; font-size: 2rem;">1091</h2>
+            </div>
+        </a>
+
+        <!-- Ambulance -->
+        <a href="tel:102" style="text-decoration: none; color: inherit;">
+            <div class="card" style="text-align: center; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🚑</span>
+                <h3 style="margin: 0; color: #333;">Ambulance</h3>
+                <h2 style="color: #ea70f1; margin: 0.5rem 0 0 0; font-size: 2rem;">102</h2>
+            </div>
+        </a>
+
+        <!-- Domestic Abuse -->
+        <a href="tel:181" style="text-decoration: none; color: inherit;">
+            <div class="card" style="text-align: center; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🤝</span>
+                <h3 style="margin: 0; color: #333;">Domestic Abuse</h3>
+                <h2 style="color: #ea70f1; margin: 0.5rem 0 0 0; font-size: 2rem;">181</h2>
+            </div>
+        </a>
+
+        <!-- Cyber Crime -->
+        <a href="tel:1930" style="text-decoration: none; color: inherit;">
+            <div class="card" style="text-align: center; transition: transform 0.2s; cursor: pointer;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">💻</span>
+                <h3 style="margin: 0; color: #333;">Cyber Crime</h3>
+                <h2 style="color: #ea70f1; margin: 0.5rem 0 0 0; font-size: 2rem;">1930</h2>
+            </div>
+        </a>
+
+    </div>
+</div>
+{% endblock %}
